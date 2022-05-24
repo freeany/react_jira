@@ -11,4 +11,4 @@
 
 
 如果你只是添加了几个空格， 那么lint-staged prevented an empty git commit.
-lint-staged会阻止你的提交。
+lint-staged会阻止你的提交。所以它会帮你检查这次提交是否是一个有效的提交。
