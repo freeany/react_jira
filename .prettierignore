@@ -1,3 +1,9 @@
 # Ignore artifacts:
-build
-coverage
+# build
+# coverage
+
+# 忽略所有文件夹
+/*
+# 但不包含src文件夹下的文件
+!src/
+# 这样做的好处是忽略可以只选择src下的文件进行prettier校验
