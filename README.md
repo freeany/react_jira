@@ -176,3 +176,25 @@ DELETE /tickets/12 // 删除
 
 点 [我](https://segmentfault.com/q/1010000005685904) 了解 `patch vs put` 
 
+
+## react hook
+```js
+  const isFalsy = (value: string) => (value === '0' ? false : !value)
+  // 我们是否要把cleanObjectNotContainerZero这个函数写成hook呢？
+  // 其实是不需要的
+  // 自定义hook的内部是要有使用react内置的hook的。 而cleanObjectNotContainerZero内部并没有使用到内部的hook
+  // 如果一个函数我们需要使用react提供的自定义钩子，那么可以做一个自定义hook来方便复用。
+  export function cleanObjectNotContainerZero(obj: any) {
+    const newObj = { ...obj }
+    Object.keys(newObj).forEach((key: string) => {
+      const v = newObj[key]
+      if (isFalsy(v)) {
+        delete newObj[key]
+      }
+    })
+    return newObj
+  }
+```
+
+什么时候用函数，什么时候用hook？
+对应custom hook来说，最大的特征就是内部需要使用到别的hook。而如果一个函数内部不需要使用到别的hook那么做一个函数也挺好的。
