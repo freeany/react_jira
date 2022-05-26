@@ -1,10 +1,9 @@
-import qs from 'qs'
 import { useEffect, useState } from 'react'
 import { cleanObjectNotContainerZero, useDebounce } from 'utils'
+import { useHttp } from 'utils/http'
 import List, { Project } from './List'
 import Search, { User, Params } from './Search'
 
-const apiPrefix = process.env.REACT_APP_API_URL
 export default function ProjectList() {
 	// 查询参数
 	const [params, setParams] = useState<Params>({
@@ -17,19 +16,22 @@ export default function ProjectList() {
 	// 查询用户列表
 	const [users, setUsers] = useState<Array<User>>([])
 
-	const debounceParams = useDebounce(params, 2000)
+	const debounceParams = useDebounce(params, 200)
+	const client = useHttp()
 
 	useEffect(() => {
-		fetch(`${apiPrefix}/users`).then(async res => {
-			const u = await res.json()
-			setUsers(u)
-		})
+		// fetch(`${apiPrefix}/users`).then(async res => {
+		// 	const u = await res.json()
+		// 	setUsers(u)
+		// })
+		client('users').then(setUsers)
 	}, [])
 
 	useEffect(() => {
-		fetch(`${apiPrefix}/projects?${qs.stringify(cleanObjectNotContainerZero(debounceParams))}`).then(async res => {
-			setList(await res.json())
-		})
+		// fetch(`${apiPrefix}/projects?${qs.stringify(cleanObjectNotContainerZero(debounceParams))}`).then(async res => {
+		// 	setList(await res.json())
+		// })
+		client('projects', { data: cleanObjectNotContainerZero(debounceParams) }).then(setList)
 	}, [debounceParams])
 
 	return (

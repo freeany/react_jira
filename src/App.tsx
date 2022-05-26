@@ -1,15 +1,16 @@
 import ProjectList from 'screens/ProjectList'
 import TryUseArray from './try-use-array'
 import './App.css'
-import Login from 'screens/login'
+import { useAuth } from 'context/auth-context'
+import UnAuthenticated from 'unauthenticated-app'
+import AuthenticatedApp from 'authenticated-app'
 
 function App() {
-	const data = 'aa'
+	const { user } = useAuth()
 	return (
 		<div className="App">
-			{/* <ProjectList></ProjectList> */}
 			{/* <TryUseArray></TryUseArray> */}
-			<Login></Login>
+			{user ? <AuthenticatedApp></AuthenticatedApp> : <UnAuthenticated></UnAuthenticated>}
 		</div>
 	)
 }

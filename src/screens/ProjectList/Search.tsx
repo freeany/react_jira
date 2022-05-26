@@ -12,6 +12,10 @@ interface SearchPanelProps {
 export interface User {
 	id: number
 	name: string
+	email: string
+	title: string
+	organization: string
+	token: string
 }
 
 export default function Search({ users, params, setParams }: SearchPanelProps) {
