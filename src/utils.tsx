@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
-
-const isFalsy = (value: string) => (value === '0' ? false : !value)
+import { useEffect, useState } from 'react'
+import { Person } from 'try-use-array'
+const isFalsy = (value: unknown) => (value === '0' ? false : !value)
 // 我们是否要把cleanObjectNotContainerZero这个函数写成hook呢？
 // 其实是不需要的
 // 自定义hook的内部是要有使用react内置的hook的。 而cleanObjectNotContainerZero内部并没有使用到内部的hook
@@ -35,8 +35,28 @@ export function useMount(callback: () => void) {
 	}, [])
 }
 
+// 对数组进行一些操作的hook
+export function useArray<T>(intalState: T[]) {
+	const [value, setValue] = useState(intalState)
+	const add = (data: T) => {
+		setValue([...value, data])
+	}
+	const clear = () => setValue([])
+	const removeIndex = (index: number) => {
+		const newValue = [...value]
+		newValue.splice(index, 1)
+		setValue(newValue)
+	}
+	return {
+		value,
+		clear,
+		removeIndex,
+		add
+	}
+}
+
 // react hooks实现防抖
-export function useDebounce(value: any, delay: number) {
+export function useDebounce<T>(value: T, delay: number) {
 	const [debounceValue, setDebounceValue] = useState(value)
 	useEffect(() => {
 		const timeId = setTimeout(() => setDebounceValue(value), delay)

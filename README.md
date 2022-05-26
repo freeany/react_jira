@@ -159,7 +159,8 @@ Mock.mock(/\\\\/api\\\\/visitor\\\\/list/, 'get', {
 
 1. 与接口管理工具相比，无法随着后端 API 的修改而自动修改
 
-
+注: 
+  只能模拟普通的Restful风格的API， 如果要做一个如login这样的功能，那么就要加入中间件。
 
 ## REST API
 
@@ -198,3 +199,41 @@ DELETE /tickets/12 // 删除
 
 什么时候用函数，什么时候用hook？
 对应custom hook来说，最大的特征就是内部需要使用到别的hook。而如果一个函数内部不需要使用到别的hook那么做一个函数也挺好的。
+
+
+xxx.d.ts  是给  xxx.js 打补丁用的。
+
+## ts和java的区别
+鸭子类型:  ts中是面向接口编程，而不是面向对象编程
+
+```js
+  interface Student {
+    name: string,
+    age: number
+  }
+  function test(data: Student) {
+    return data
+  }
+  const s1: Student = { name: 'zs', age: 123 }
+  // s2并没有显式的标明是一个Student类型，但是 `test(s2)` 并没有报错，这就是ts和其他如java这种强类型语言的其中一个区别。
+  // 所以test函数需要的参数根本就不关心你传入的数据是不是标明了是Student类型。只要符合Student接口的数据就可以了。这就是鸭子类型。
+  const s2 = { name: 'qq', age: 111 }
+  test(s1)
+  test(s2)
+```
+
+### ts中的类型兼容
+```js
+  interface Base {
+    id: number
+  }
+  interface Advance extends Base {
+    name: string
+  }
+  function test(data: Base) { }
+
+  const advanceData: Advance = {id: 123, name: 'qqq'}
+  // 我要的是一个Base类型的参数，但是你给我传递了一个更强大的Advance类型，我也可以接受。
+  test(advanceData)
+```
+

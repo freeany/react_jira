@@ -1,6 +1,6 @@
 export interface Params {
 	name: string
-	personId?: number
+	personId?: string
 }
 
 interface SearchPanelProps {
@@ -20,7 +20,7 @@ export default function Search({ users, params, setParams }: SearchPanelProps) {
 			<input
 				type="text"
 				value={params.name}
-				onChange={(evt: any) =>
+				onChange={evt =>
 					setParams({
 						...params,
 						name: evt.target.value
@@ -29,7 +29,7 @@ export default function Search({ users, params, setParams }: SearchPanelProps) {
 			/>
 			<select
 				value={params.personId}
-				onChange={(evt: any) =>
+				onChange={evt =>
 					setParams({
 						...params,
 						personId: evt.target.value

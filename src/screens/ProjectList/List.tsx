@@ -9,7 +9,7 @@ export interface Project {
 }
 
 interface ListPanelProps {
-	users: Array<User>
+	users: User[]
 	list: Array<Project>
 }
 
