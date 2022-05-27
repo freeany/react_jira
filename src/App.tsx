@@ -1,5 +1,3 @@
-import ProjectList from 'screens/ProjectList'
-import TryUseArray from './try-use-array'
 import './App.css'
 import { useAuth } from 'context/auth-context'
 import UnAuthenticated from 'unauthenticated-app'

@@ -14,6 +14,9 @@
     `npm install --save-dev --save-exact prettier`
 
 2. 创建 .prettierrc.js 配置文件
+
+    > echo {}> .prettierrc.json
+
     https://prettier.io/docs/en/options.html#print-width
 
 3. 添加.prettierignore
@@ -31,6 +34,7 @@
           "*.{js,css,md,ts,tsx}": "prettier --write"
       }
     ```
+
 7. 如果项目项目配置中使用了eslint的时候
     prettier和eslint可能会有冲突,  `npm i eslint-config-prettier`
     在package.json中添加
@@ -54,7 +58,7 @@
 
 8. 在commit的时候我们想要去规范commit的message
      	  github文档： https://github.com/conventional-changelog/commitlint
-    
+        
     - ` npm i commitlint `
     
     -  ` echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js `
@@ -235,5 +239,71 @@ xxx.d.ts  是给  xxx.js 打补丁用的。
   const advanceData: Advance = {id: 123, name: 'qqq'}
   // 我要的是一个Base类型的参数，但是你给我传递了一个更强大的Advance类型，我也可以接受。
   test(advanceData)
+```
+
+
+
+### ts类型体操之Utility Type
+
+```js
+
+// 类型别名、Utility Type 讲解
+// 联合类型
+let myFavoriteNumber: string | number;
+myFavoriteNumber = "seven";
+myFavoriteNumber = 7;
+// TS2322: Type '{}' is not assignable to type 'string | number'.
+// myFavoriteNumber = {}
+let jackFavoriteNumber: string | number;
+
+// 类型别名在很多情况下可以和interface互换
+// interface Person {
+//   name: string
+// }
+// type Person = { name: string }
+// const xiaoMing: Person = {name: 'xiaoming'}
+
+// interface 在联合类型下没法替代type
+// 类型别名, 
+type FavoriteNumber = string | number;
+let roseFavoriteNumber: FavoriteNumber = "6";
+
+// interface 也没法实现Utility type
+type Person = {
+  name: string;
+  age: number;
+};
+
+// unitlity Type 
+// 我们完全可以重新改原来的type来满足我们的业务需求，但是原来的type可能是第三方库中的，或者我们为了代码整洁性，所以我们并不想修改原来的type
+
+
+// 将泛型中所有的key都变成了 key?: value
+const xiaoMing: Partial<Person> = { };
+// 第二个参数是要删除的属性名
+// 当使用Omit将属性全部删除完之后，那么这个type或者interface也就没有意义了，想些啥就写啥，
+const shenMiRen: Omit<Person, "name" | "age"> = {};
+
+// keyof 就是把Person的键名全部取出来。
+type PersonKeys = keyof Person; 
+// 等价于:  type PersonKeys = 'name' | 'age'
+
+// 第二参数是要拿出来的类型。和Omit相反
+// type PersonOnlyName = Pick<Person, "name" | "age">;
+type PersonOnlyName = Pick<Person, "name">;
+// 等价于
+// type PersonOnlyName = {
+//   name: string
+// }
+
+// 从联合类型中过滤出类型
+type Age = Exclude<PersonKeys, "name">;
+// 等价于 type Age = "age"
+
+// Partial 的实现
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+
 ```
 

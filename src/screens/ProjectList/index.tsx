@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { cleanObjectNotContainerZero, useDebounce } from 'utils'
+import { cleanObjectNotContainerZero, useDebounce, useMount } from 'utils'
 import { useHttp } from 'utils/http'
 import List, { Project } from './List'
 import Search, { User, Params } from './Search'
@@ -19,13 +19,13 @@ export default function ProjectList() {
 	const debounceParams = useDebounce(params, 200)
 	const client = useHttp()
 
-	useEffect(() => {
+	useMount(() => {
 		// fetch(`${apiPrefix}/users`).then(async res => {
 		// 	const u = await res.json()
 		// 	setUsers(u)
 		// })
 		client('users').then(setUsers)
-	}, [])
+	})
 
 	useEffect(() => {
 		// fetch(`${apiPrefix}/projects?${qs.stringify(cleanObjectNotContainerZero(debounceParams))}`).then(async res => {
@@ -33,11 +33,10 @@ export default function ProjectList() {
 		// })
 		client('projects', { data: cleanObjectNotContainerZero(debounceParams) }).then(setList)
 	}, [debounceParams])
-
 	return (
-		<div>
+		<>
 			<Search params={params} setParams={setParams} users={users}></Search>
 			<List list={list} users={users}></List>
-		</div>
+		</>
 	)
 }

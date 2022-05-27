@@ -1,35 +1,32 @@
-import { FormEvent } from 'react'
 import { useAuth } from 'context/auth-context'
+import { Button, Form, Input } from 'antd'
+import { LoginUserInfo } from 'auth-provider'
 export default function Login() {
-	const { user, login, logout } = useAuth()
-	function handleSubmit(e: FormEvent<HTMLFormElement>) {
-		e.preventDefault()
-		const username = (e.currentTarget.elements[0] as HTMLInputElement).value
-		const password = (e.currentTarget.elements[1] as HTMLInputElement).value
-		login({ username, password })
-	}
-
-	function logoutUser() {
-		logout()
+	const { login } = useAuth()
+	function handleSubmit(values: LoginUserInfo) {
+		login(values)
 	}
 
 	return (
 		<>
-			<form onSubmit={handleSubmit}>
-				<div>{user ? user.name : null}</div>
-				<div>
-					<label htmlFor="username">用户名</label>
-					<input type="text" id="username" defaultValue={'jack'} />
-				</div>
-				<div>
-					<label htmlFor="password">密码</label>
-					<input type="text" id="password" defaultValue="123" />
-				</div>
-				<div>
-					<input type="submit" value="提交" />
-				</div>
-			</form>
-			<button onClick={() => logoutUser()}>退出</button>
+			<Form
+				onFinish={handleSubmit}
+				initialValues={{ username: 'jack', password: '123' }}
+				labelAlign="left"
+				labelCol={{ span: 6 }}
+			>
+				<Form.Item label="用户名" name="username" rules={[{ required: true, message: '请输入用户名' }]}>
+					<Input placeholder="请输入用户名" />
+				</Form.Item>
+				<Form.Item label="密码" name="password" rules={[{ required: true, message: '请输入密码' }]}>
+					<Input placeholder="请输入密码" />
+				</Form.Item>
+				<Form.Item>
+					<Button type="primary" htmlType="submit">
+						登录
+					</Button>
+				</Form.Item>
+			</Form>
 		</>
 	)
 }

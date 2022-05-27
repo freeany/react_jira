@@ -1,3 +1,5 @@
+import { Form, Input, Select } from 'antd'
+
 export interface Params {
 	name: string
 	personId?: string
@@ -20,33 +22,37 @@ export interface User {
 
 export default function Search({ users, params, setParams }: SearchPanelProps) {
 	return (
-		<form>
-			<input
-				type="text"
-				value={params.name}
-				onChange={evt =>
-					setParams({
-						...params,
-						name: evt.target.value
-					})
-				}
-			/>
-			<select
-				value={params.personId}
-				onChange={evt =>
-					setParams({
-						...params,
-						personId: evt.target.value
-					})
-				}
-			>
-				<option value={''}>负责人</option>
-				{users.map(user => (
-					<option key={user.id} value={user.id}>
-						{user.name}
-					</option>
-				))}
-			</select>
-		</form>
+		<Form layout={'inline'} style={{ marginBottom: '2rem' }}>
+			<Form.Item>
+				<Input
+					value={params.name}
+					onChange={e =>
+						setParams({
+							...params,
+							name: e.target.value
+						})
+					}
+				/>
+			</Form.Item>
+			<Form.Item>
+				<Select
+					style={{ width: 90 }}
+					defaultValue=""
+					onChange={value =>
+						setParams({
+							...params,
+							personId: value
+						})
+					}
+				>
+					<Select.Option value="">负责人</Select.Option>
+					{users.map(user => (
+						<Select.Option key={user.id} value={user.id}>
+							{user.name}
+						</Select.Option>
+					))}
+				</Select>
+			</Form.Item>
+		</Form>
 	)
 }
