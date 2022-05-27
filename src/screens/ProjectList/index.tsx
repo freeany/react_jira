@@ -1,8 +1,14 @@
+import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
 import { cleanObjectNotContainerZero, useDebounce, useMount } from 'utils'
 import { useHttp } from 'utils/http'
 import List, { Project } from './List'
 import Search, { User, Params } from './Search'
+
+const ProjectListStyle = styled.div`
+	padding: 0 3.2rem;
+	padding-top: 1rem;
+`
 
 export default function ProjectList() {
 	// 查询参数
@@ -34,9 +40,9 @@ export default function ProjectList() {
 		client('projects', { data: cleanObjectNotContainerZero(debounceParams) }).then(setList)
 	}, [debounceParams])
 	return (
-		<>
+		<ProjectListStyle>
 			<Search params={params} setParams={setParams} users={users}></Search>
 			<List list={list} users={users}></List>
-		</>
+		</ProjectListStyle>
 	)
 }
