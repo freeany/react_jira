@@ -58,7 +58,7 @@
 
 8. 在commit的时候我们想要去规范commit的message
      	  github文档： https://github.com/conventional-changelog/commitlint
-        
+       
     - ` npm i commitlint `
     
     -  ` echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js `
@@ -324,3 +324,118 @@ type Partial<T> = {
  */
 ```
 
+## custom hook
+
+custom hook 大都是函数中返回一个函数， 闭包。 如果需要返回的数据需要外部的xxx参数，那么就需要闭包的。这个概念和思想很重要。
+
+## 处理react项目中的title
+
+https://github.com/nfl/react-helmet
+
+## 梳理整体流程
+
+1. user用户信息由provider提供，当页面加载时根据localstorage中token获取用户信息。
+   ```js
+   <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>
+   ```
+   向外暴露用户信息，登录/注册/退出方法
+2. 封装custom hooks， 向外暴露这个AuthContext context。以方便获取用户信息和登录行为。
+  ```js
+    export const useAuth = () => {
+    const context = React.useContext(AuthContext)
+    if (!context) {
+      throw new Error('useAuth必须在AuthProvider中展示')
+      }
+      return context
+    }
+  ```
+3. 封装custom hook    `useAsync<User | null>();`  ， 功能为对接口请求进行处理， 向外暴露该promise的状态和数据
+
+   - promise的结果  即data
+   - promise发生错误的 error
+   - isLoading是否正在请求中
+   - isIdel 尚未开始
+   - isError 是否错误
+   - run 执行promise的方法
+   - setData 设置数据
+
+   ```js
+   import { useState } from "react"
+   
+   export interface State<D> {
+     error: Error | null,
+     data: D | null,
+     stat: 'idle' | 'loading' | 'error' | 'success'
+   }
+   
+   const defaultInitalState: State<null> = {
+     stat: "idle",
+     data: null,
+     error: null,
+   }
+   
+   const defaultConfig = {
+     throwOnError: false,
+   };
+   // useAsync 封装了获取异步请求的状态， 只要将异步操作传递进来，那么该custom hook返回的数据有数据的状态和数据内容，在外面直接使用即可。
+   export function useAsync<D>(
+     initialState?: State<D>,
+     initialConfig?: typeof defaultConfig
+   ) {
+     const config = { ...defaultConfig, ...initialConfig };
+   
+     const [state, setState] = useState({
+       ...defaultInitalState,
+       ...initialState
+     })
+   
+     const setData = (data: D) => setState({
+       stat: 'success',
+       data,
+       error: null
+     })
+   
+     const setError = (error: Error) => setState({
+       stat: 'error',
+       data: null,
+       error
+     })
+   
+     const run = (promise: Promise<D>) => {
+       if (!promise || !promise.then) {
+         throw new Error("请传入promise类型的参数")
+       }
+   
+       setState({...state, stat: 'loading'})
+       return promise
+         .then(data => {
+           setData(data)
+           return data
+         })
+         .catch(error => {
+           setError(error)
+           if (config.throwOnError) return Promise.reject(error);
+           return error;
+         })
+     }
+   
+     return {
+       isIdle: state.stat === "idle",
+       isLoading: state.stat === "loading",
+       isError: state.stat === "error",
+       isSuccess: state.stat === "success",
+       run,
+       setData,
+       setError,
+       ...state,
+     }
+   }
+   ```
+
+4. 在App.tsx中使用ErrorBoundle包裹App组件捕获边界错误
+
+   开源库 `https://github.com/bvaughn/react-error-boundary`
+
+   根据user判断是进入 `有权限组件` 还是 `无权限组件`
+
+   无权限组件为登录和注册组件，有权限组件为页面级的组件

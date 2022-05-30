@@ -1,10 +1,17 @@
 import { useAuth } from 'context/auth-context'
 import { Button, Form, Input } from 'antd'
 import { LoginUserInfo } from 'auth-provider'
-export default function Login() {
+import { useAsync } from 'utils/useAsync'
+export default function Login({ setError }: { setError: (error: Error) => void }) {
 	const { login } = useAuth()
-	function handleSubmit(values: LoginUserInfo) {
-		login(values)
+	const { run, isLoading: loading } = useAsync(undefined, { throwOnError: true })
+
+	async function handleSubmit(values: LoginUserInfo) {
+		try {
+			await run(login(values))
+		} catch (error) {
+			setError(error as Error)
+		}
 	}
 
 	return (
@@ -21,7 +28,7 @@ export default function Login() {
 				<Input placeholder="请输入密码" />
 			</Form.Item>
 			<Form.Item>
-				<Button type="primary" htmlType="submit">
+				<Button loading={loading} type="primary" htmlType="submit">
 					登录
 				</Button>
 			</Form.Item>

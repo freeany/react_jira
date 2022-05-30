@@ -37,12 +37,14 @@ const User = () => {
 	const { user } = useAuth()
 	return (
 		<Dropdown overlay={MenuFn()}>
-			<a onClick={e => e.preventDefault()}>
+			{/* <a onClick={e => e.preventDefault()}> */}
+			<Button type={'link'}>
 				<Space>
 					{user ? `Hi, ${user.name}` : '登录'}
 					<DownOutlined />
 				</Space>
-			</a>
+			</Button>
+			{/* </a> */}
 		</Dropdown>
 	)
 }

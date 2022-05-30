@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Person } from 'try-use-array'
-const isFalsy = (value: unknown) => (value === '0' ? false : !value)
+// import { Person } from 'try-use-array'
+// const isFalsy = (value: unknown) => (value === '0' ? false : !value)
+export const isVoid = (v: unknown) => v === null || v === undefined || v === ''
 // 我们是否要把cleanObjectNotContainerZero这个函数写成hook呢？
 // 其实是不需要的
 // 自定义hook的内部是要有使用react内置的hook的。 而cleanObjectNotContainerZero内部并没有使用到内部的hook
 // 如果一个函数我们需要使用react提供的自定义钩子，那么可以做一个自定义hook来方便复用。
+
+// 不要用object, 用(obj: { [key: string]: unknown })这个能稳稳的限制住我们想要的object : {}类型。
+// { [key: string]: unknown }
 export function cleanObjectNotContainerZero(obj: any) {
 	const newObj = { ...obj }
 	Object.keys(newObj).forEach((key: string) => {
 		const v = newObj[key]
-		if (isFalsy(v)) {
+		// if (isFalsy(v)) {
+		if (isVoid(v)) {
 			delete newObj[key]
 		}
 	})

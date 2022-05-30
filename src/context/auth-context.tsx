@@ -1,8 +1,10 @@
 import * as auth from 'auth-provider'
-import React, { ReactNode, useState } from 'react'
+import { FullPageErrorFallback, FullPageLoading } from 'components/lib'
+import React, { ReactNode } from 'react'
 import { User } from 'screens/ProjectList/Search'
 import { useMount } from 'utils'
 import { http } from 'utils/http'
+import { useAsync } from 'utils/useAsync'
 const AuthContext = React.createContext<
 	| {
 			user: User | null
@@ -24,16 +26,37 @@ export const bootstrapUser = async () => {
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-	const [user, setUser] = useState<User | null>(null)
-	const login = (form: auth.LoginUserInfo) => auth.login(form).then(data => setUser(data))
-	const register = (form: auth.LoginUserInfo) => auth.register(form).then(data => setUser(data))
+	const { data: user, error, isLoading, isIdle, isError, run, setData: setUser } = useAsync<User | null>()
+
+	// const [user, setUser] = useState<User | null>(null)
+	const login = (form: auth.LoginUserInfo) =>
+		auth
+			.login(form)
+			.then(data => setUser(data))
+			.catch(error => Promise.reject(error))
+	const register = (form: auth.LoginUserInfo) =>
+		auth
+			.register(form)
+			.then(data => setUser(data))
+			.catch(error => Promise.reject(error))
 	const logout = () =>
-		auth.logout().then(() => {
-			setUser(null)
-		})
+		auth
+			.logout()
+			.then(() => setUser(null))
+			.catch(error => Promise.reject(error))
+
 	useMount(() => {
-		bootstrapUser().then(setUser)
+		run(bootstrapUser())
 	})
+
+	if (isIdle || isLoading) {
+		return <FullPageLoading />
+	}
+
+	if (isError) {
+		return <FullPageErrorFallback error={error} />
+	}
+
 	return <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>
 }
 

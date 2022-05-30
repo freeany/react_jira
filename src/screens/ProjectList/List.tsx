@@ -1,5 +1,4 @@
-import styled from '@emotion/styled'
-import { Table } from 'antd'
+import { Table, TableProps } from 'antd'
 import dayjs from 'dayjs'
 import { User } from './Search'
 
@@ -10,12 +9,11 @@ export interface Project {
 	organization: string
 	created: number
 }
-
-interface ListPanelProps {
+interface TableType extends TableProps<Project> {
 	users: User[]
-	list: Array<Project>
+	list: Project[]
 }
-export default function List({ users, list }: ListPanelProps) {
+export default function List({ users, list, ...reset }: TableType) {
 	return (
 		<Table
 			pagination={false}
@@ -49,6 +47,7 @@ export default function List({ users, list }: ListPanelProps) {
 					}
 				}
 			]}
+			{...reset}
 		></Table>
 	)
 }
