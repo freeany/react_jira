@@ -8,8 +8,8 @@ import ProjectList from 'screens/ProjectList'
 // import { } from 'react-'
 import Test from './hook和闭包'
 import { useDoucumentTitle } from 'utils/index'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import ProjectDetail from 'screens/ProjectDetail'
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
+import ProjectDetail from 'screens/project'
 export default function AuthenticatedApp() {
 	useDoucumentTitle('项目管理', false)
 	return (
@@ -19,6 +19,8 @@ export default function AuthenticatedApp() {
 				<Routes>
 					<Route path="/project-list" element={<ProjectList />}></Route>
 					<Route path={`/project/:id/*`} element={<ProjectDetail />}></Route>
+					{/* <Navigate to={"/project-list"} /> */}
+					<Route path="*" element={<Navigate to={'/project-list'} replace />}></Route>
 				</Routes>
 			</Router>
 			{/* <Test></Test> */}

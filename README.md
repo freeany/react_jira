@@ -439,3 +439,26 @@ https://github.com/nfl/react-helmet
    根据user判断是进入 `有权限组件` 还是 `无权限组件`
 
    无权限组件为登录和注册组件，有权限组件为页面级的组件
+
+
+
+## react-router@6
+
+- 没有`Switch`和`Redirect`组件可以使用了
+- 新增了一个`Routes`组件，所有的`Route`组件都应该被Routes包裹，在`Routes`组件外使用`Route`将报错
+- `Navigate`组件不能写在`Routes`中，否则也会报错，也就是`Routes`组件只接收`Route`作为其子组件
+
+​	使用Navigation进行兜底
+
+```jsx
+<Router>
+  <Link to={"/aaa"}>to 1 aaa</Link>
+  <Link to="/bbb">to 2 bbb</Link>
+	<Routes>
+    <Route path="aaa" element={<Child />}></Route>
+    <Route path="bbb" element={<Child2 />}></Route>
+    <Route path="*" element={<Navigate to={"aaa"} replace />}></Route>
+	</Routes>
+</Router>
+```
+
