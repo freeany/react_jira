@@ -6,6 +6,7 @@ import left from 'assets/left.svg'
 import right from 'assets/right.svg'
 import Login from './login'
 import Register from './register'
+import { useDoucumentTitle } from 'utils/index'
 
 export default function UnAuthenticated() {
 	const [isRegister, setIsRegister] = useState(false)
@@ -13,6 +14,7 @@ export default function UnAuthenticated() {
 	useEffect(() => {
 		setError(null)
 	}, [isRegister])
+	// useDoucumentTitle('请登录或注册', false)
 	return (
 		<Container>
 			<Header />

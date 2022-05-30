@@ -1,5 +1,6 @@
 import { Table, TableProps } from 'antd'
 import dayjs from 'dayjs'
+import { Link } from 'react-router-dom'
 import { User } from './Search'
 
 export interface Project {
@@ -21,7 +22,11 @@ export default function List({ users, list, ...reset }: TableType) {
 			columns={[
 				{
 					title: '名称',
-					dataIndex: 'name',
+					// dataIndex: 'name',
+					render(a) {
+						// 等价于 to={`${a.id}`} 因为此组件是在 /project路由下的。所以当在这个路由下跳转的时候，会自动加上/project
+						return <Link to={`/project/${a.id}`}>{a.name}</Link>
+					},
 					key: 'name',
 					sorter(a, b) {
 						return a.name.localeCompare(b.name)

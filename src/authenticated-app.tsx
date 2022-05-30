@@ -5,12 +5,23 @@ import { ReactComponent as SoftwareLogo } from 'assets/software-logo.svg'
 import { Row } from 'components/lib'
 import { useAuth } from 'context/auth-context'
 import ProjectList from 'screens/ProjectList'
-
+// import { } from 'react-'
+import Test from './hook和闭包'
+import { useDoucumentTitle } from 'utils/index'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import ProjectDetail from 'screens/ProjectDetail'
 export default function AuthenticatedApp() {
+	useDoucumentTitle('项目管理', false)
 	return (
 		<Container>
 			<PageHeader></PageHeader>
-			<ProjectList></ProjectList>
+			<Router>
+				<Routes>
+					<Route path="/project-list" element={<ProjectList />}></Route>
+					<Route path={`/project/:id/*`} element={<ProjectDetail />}></Route>
+				</Routes>
+			</Router>
+			{/* <Test></Test> */}
 		</Container>
 	)
 }

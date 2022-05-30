@@ -2,11 +2,13 @@ import { useAuth } from 'context/auth-context'
 import { Button, Form, Input } from 'antd'
 import { LoginUserInfo } from 'auth-provider'
 import { useAsync } from 'utils/useAsync'
+import { useDoucumentTitle } from 'utils/index'
 interface RegisterUserInfo extends LoginUserInfo {
 	cpassword: string
 }
 
 export default function Register({ setError }: { setError: (error: Error) => void }) {
+	useDoucumentTitle('注册', false)
 	const { register } = useAuth()
 	const { run, isLoading: loading } = useAsync()
 	async function handleSubmit({ cpassword, ...values }: RegisterUserInfo) {
