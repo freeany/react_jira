@@ -10,20 +10,32 @@ import Test from './hook和闭包'
 import { useDoucumentTitle } from 'utils/index'
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import ProjectDetail from 'screens/project'
+import { useUrlQueryParam } from 'utils/url'
+import { useState } from 'react'
+import CreateProject from 'components/createProject'
+import ProjectPopover from 'components/project-popover'
+
+import { useUpdateEffect } from 'utils/index'
 export default function AuthenticatedApp() {
 	useDoucumentTitle('项目管理', false)
+	const [projectModelVisible, setProjectModelVisible] = useState(false)
 	return (
 		<Container>
-			<PageHeader></PageHeader>
+			<PageHeader setProjectModelVisible={(visible: boolean) => setProjectModelVisible(visible)}></PageHeader>
+			{/* <Button onClick={() => setProjectModelVisible(true)}>打开</Button> */}
 			<Router>
 				<Routes>
-					<Route path="/project-list" element={<ProjectList />}></Route>
+					<Route
+						path="/project-list"
+						element={<ProjectList setProjectModelVisible={(visible: boolean) => setProjectModelVisible(visible)} />}
+					></Route>
 					<Route path={`/project/:id/*`} element={<ProjectDetail />}></Route>
 					{/* <Navigate to={"/project-list"} /> */}
 					<Route path="*" element={<Navigate to={'/project-list'} replace />}></Route>
 				</Routes>
 			</Router>
 			{/* <Test></Test> */}
+			<CreateProject visible={projectModelVisible} onClose={() => setProjectModelVisible(false)}></CreateProject>
 		</Container>
 	)
 }
@@ -48,6 +60,11 @@ const MenuFn = () => {
 
 const User = () => {
 	const { user } = useAuth()
+	const [dep, setDep] = useState(1)
+	useUpdateEffect(() => console.log(dep), [dep])
+	setTimeout(() => {
+		setDep(2)
+	}, 2000)
 	return (
 		<Dropdown overlay={MenuFn()}>
 			{/* <a onClick={e => e.preventDefault()}> */}
@@ -62,12 +79,13 @@ const User = () => {
 	)
 }
 
-const PageHeader = () => {
+const PageHeader = ({ setProjectModelVisible }: { setProjectModelVisible: (visible: boolean) => void }) => {
 	return (
 		<Header between={true}>
 			<HeaderLeft gap={true}>
 				<SoftwareLogo width={'18rem'} color={'rgb(38, 132, 255)'} />
-				<h2>项目</h2>
+				{/* <h2>项目</h2> */}
+				<ProjectPopover open={setProjectModelVisible}></ProjectPopover>
 				<h2>用户</h2>
 			</HeaderLeft>
 			<HeaderRight>

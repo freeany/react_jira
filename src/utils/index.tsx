@@ -19,3 +19,16 @@ export const useDoucumentTitle = (title: string, keepOnUnMount = true) => {
 		}
 	}, [keepOnUnMount, oldTitle]) // 故意没有添加依赖，故意让拿到的值不是最新鲜的
 }
+
+export const useUpdateEffect: typeof useEffect = (effect, deps) => {
+	const isMounted = useRef(false)
+
+	useEffect(() => {
+		if (!isMounted.current) {
+			isMounted.current = true
+		} else {
+			return effect()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [deps])
+}

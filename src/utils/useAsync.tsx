@@ -17,8 +17,12 @@ const defaultConfig = {
 }
 // useAsync 封装了获取异步请求的状态， 只要将异步操作传递进来，那么该custom hook返回的数据有数据的状态和数据内容，在外面直接使用即可。
 export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) {
+	const [retry, setRetry] = useState<() => void>(() => () => undefined)
+
 	const config = { ...defaultConfig, ...initialConfig }
 
+	const [a, setA] = useState([1, 2, 3])
+	const [b, setB] = useState(1)
 	const [state, setState] = useState({
 		...defaultInitalState,
 		...initialState
@@ -38,10 +42,15 @@ export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defa
 			error
 		})
 
-	const run = (promise: Promise<D>) => {
+	const run = (promise: Promise<D>, runConfig?: { run: () => Promise<D> }) => {
 		if (!promise || !promise.then) {
 			throw new Error('请传入promise类型的参数')
 		}
+		setRetry(() => () => {
+			if (runConfig?.run) {
+				run(runConfig.run(), runConfig)
+			}
+		})
 
 		setState({ ...state, stat: 'loading' })
 		return promise
@@ -62,8 +71,13 @@ export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defa
 		isError: state.stat === 'error',
 		isSuccess: state.stat === 'success',
 		run,
+		retry,
 		setData,
 		setError,
+		a,
+		setA,
+		b,
+		setB,
 		...state
 	}
 }

@@ -328,6 +328,8 @@ type Partial<T> = {
 
 custom hook 大都是函数中返回一个函数， 闭包。 如果需要返回的数据需要外部的xxx参数，那么就需要闭包的。这个概念和思想很重要。
 
+我们自定义的hook返回值问题，我们可以返回一个tuple， 也可以返回一个对象，当返回值小于等于三个的时候，返回tuple，当返回值大于三个的时候返回对象，因为使用tuple的好处是导出的时候可以随便命名， 比如useState， 可以 `const [a, setA] = useState()`， 但是先后顺序不能乱，如果不知道需要看源代码第一个是什么，第二个是什么， 使用对象的好处是导出的时候顺序随便写， 但是导出的时候不能随便命名。
+
 ## 处理react项目中的title
 
 https://github.com/nfl/react-helmet
@@ -462,3 +464,207 @@ https://github.com/nfl/react-helmet
 </Router>
 ```
 
+
+
+## why-did-you-render
+
+https://github.com/welldone-software/why-did-you-render
+
+> 查找是什么造成了无限渲染
+
+
+
+
+
+## react中的坑
+
+1. 尽量不要让对象作为useEffect/useMemo的依赖值。 但是如果这个对象是useState产生的，那么就没问题。
+
+2. 当组件中使用useState管理数据的时候，那么这个数据  1. 不管这个 `useState` 在哪里定义的，那么当setState发生的时候，整个组件都会被重新渲染。2. 状态被保存了，不会随着下次组件更新重置掉数据。 
+3. 如果你要在自定义hook中返回一个函数的话， 那么大概率这个函数是需要被useCallback包裹的。
+
+## for of 遍历对象
+
+> 我们可以给对象自定义[Symbol.iterator]属性(该属性是一个函数)， 来自定义遍历对象的逻辑。
+>
+> iterator是一个抽象的遍历逻辑，而数组/Map/对象已经天然的部署好了iterator，如果我们要想实现自己的遍历逻辑，那么就可以自定义自己的遍历逻辑。
+
+```js
+
+const obj = {
+  data: ["hello", "world"],
+  [Symbol.iterator]() {
+    const self = this;
+    let index = 0;
+    return {
+      next() {
+        if (index < self.data.length) {
+          return {
+            value: self.data[index++] + "!",
+            done: false
+          };
+        } else {
+          return { value: undefined, done: true };
+        }
+      }
+    };
+  }
+};
+
+for (let o of obj) {
+  console.log(o);
+}
+```
+
+
+
+## 二次封装antd组件
+
+```jsx
+import { Rate } from "antd";
+
+// 在原有组件的props上继续扩展属性
+interface PinProps extends React.ComponentProps<typeof Rate> {
+  checked: boolean,
+  onChangeChecked?: (checked: boolean) => void
+}
+
+// 对Rate组件进行二次处理
+export default function Pin(props: PinProps) {
+  const { checked, onChangeChecked = ()=>{} } = props
+  return (
+    <Rate count={1} value={ checked ? 1 : 0 } onChange={value => onChangeChecked(!!value)} />
+  )
+}
+```
+
+
+
+柯里化
+
+> onChangeChecked?: (checked: boolean) => void
+
+原来的：
+
+```jsx
+// 没有changeChecked函数， 直接return
+return <Pin checked={project.pin}  onChangeChecked={pin => editRun({...project, pin})}/>
+```
+
+现在的：
+
+```jsx
+// 柯里化函数
+const changeChecked = (project: Project) => (checked: boolean) => editRun({id: project.id, pin: checked})
+// return 柯里化函数
+return <Pin checked={project.pin}  onChangeChecked={changeChecked(project)}/>
+```
+
+
+
+
+
+## react 保存一个函数的状态
+
+1. 使用useState
+
+```jsx
+const [ callback, setCallback ] = useState(() => () => { alert('init') })
+
+return (
+	<button onClick={callback}>call callback</button>
+  <button onClick={() => setCallback(() => () => alert('update'))}>setCallback</button>
+)
+```
+
+2. 使用useRef
+
+```jsx
+const callbackRef = React.useRef(() => alert("init"));
+const callback = callbackRef.current;
+
+return (
+    <div className="App">
+      <button onClick={() => (callbackRef.current = () => alert("updated"))}>
+        setCallback
+      </button>
+    	// 必须这么写，才能保证拿到的current是最新的， 因为callbackRef.current = () => alert("updated") 这行代码并不能让该组件重新渲染，所以callback还是原来的
+      <button onClick={() => callbackRef.current()}>call callback</button>
+      // 不能这么写
+    	<!-- <button onClick={callback}>call callback</button> -->
+    	// 这样也不行, 因为从callbackRef中读current属性这个操作，只会在第一次渲染的时候执行。
+    	<!-- <button onClick={callbackRef.current}>call callback</button> -->
+    </div>
+);
+```
+
+
+
+## 卸载组件错误-在@17中被修复了
+
+> 问题出现的情况： 如果一个请求需要很长时间返回之后然后触发该组件的setState，但是在这个请求到来之前，这个组件被卸载掉但是还触发了setState去re-render这个组件，那么就会出现unmount component not render... 这样的错误。
+
+```js
+/**
+ * 返回组件的挂载状态，如果还没挂载或者已经卸载，返回false；反之，返回true
+*/
+export const useMountedRef = () => {
+  // 使用useRef
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  });
+
+  return mountedRef;
+};
+```
+
+
+
+## useRef
+
+如果用户想定义一个变量，希望这个变量的值不随着re-render被重新定义，但是又想在一些操作中改变这个变量的值。 只能用useRef。
+
+定义一个只在更新阶段执行的useEffect
+
+```js
+const isUpdated = useRef(false) // 是否是更新阶段
+useEffect(() => {
+  isUpdated.current = true // 第一次渲染置为true
+}, [])
+
+// 只在更新阶段执行的useEffect hook
+useEffect(() => {
+  if (isUpdated.current) {
+    // TODO..
+  }
+})
+```
+
+
+
+## redux
+
+> redux是一个全局状态管理库，redux中的数据是可预测的，因为redux中控制数据的reducer是一个纯函数，即相同的输入一定会有相同的输出。
+
+
+
+redux中的异步操作
+
+```js
+// 方式1: 
+loadTodo().then(todo => dispatch(addTodo(todo)))
+
+// 方式2: 
+dispatch(addTodoAsync())
+
+// 在组件中我们不想关心这个异步的细节，不想关心这个异步的需要做什么操作，什么细节，什么处理数据， 所有的操作和细节和处理数据都隐藏在addTodoAsync这个函数中了。redux-thunk让我们异步的函数可以写在action中，
+```
+
+为什么需要redux-thunk
+
+因为reducer必须是一个纯函数，而redux-thunk可以处理函数。

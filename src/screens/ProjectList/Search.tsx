@@ -1,14 +1,17 @@
-import { Form, Input, Select } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
+import { Row } from 'components/lib'
+import { Project } from './List'
 
 export interface Params {
-	name: string
+	name?: string
 	personId?: string
 }
 
 interface SearchPanelProps {
 	users: User[]
-	params: Params
+	params: Partial<Pick<Project, 'name' | 'personId'>>
 	setParams: (param: SearchPanelProps['params']) => void
+	setProjectModelVisible: (visible: boolean) => void
 }
 
 export interface User {
@@ -19,22 +22,28 @@ export interface User {
 	organization: string
 	token: string
 }
-
-export default function Search({ users, params, setParams }: SearchPanelProps) {
+// ({setProjectModelVisible}: {})
+export default function Search({ users, params, setParams, setProjectModelVisible }: SearchPanelProps) {
+	const createProject = () => {
+		setProjectModelVisible(true)
+	}
 	return (
 		<div style={{ marginBottom: '2rem' }}>
-			<h2>项目列表</h2>
+			<Row between={true} marginBottom={1}>
+				<h2>项目列表</h2>
+				<Button onClick={createProject}>创建项目</Button>
+			</Row>
 			<Form layout={'inline'} size="small">
 				<Form.Item>
 					<Input
 						placeholder="项目名"
 						value={params.name}
-						onChange={e =>
+						onChange={e => {
 							setParams({
 								...params,
 								name: e.target.value
 							})
-						}
+						}}
 					/>
 				</Form.Item>
 				<Form.Item>
@@ -44,7 +53,7 @@ export default function Search({ users, params, setParams }: SearchPanelProps) {
 						onChange={value =>
 							setParams({
 								...params,
-								personId: value
+								personId: Number(value)
 							})
 						}
 					>

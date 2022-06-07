@@ -1,3 +1,4 @@
+import './wdyr.js'
 import ReactDOM from 'react-dom/client'
 import { DevTools, loadServer } from 'jira-dev-tool'
 import 'antd/dist/antd.less'
